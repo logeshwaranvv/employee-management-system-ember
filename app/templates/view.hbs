@@ -1,0 +1,167 @@
+<div class="flex" style="flex-direction: column;height:auto;">
+	<div class="flash-container">
+		<div class="flashMessage">
+			{{#each this.flashMessages.queue as |flash|}}
+				<FlashMessage @flash={{flash}} class="message" />
+			{{/each}}
+		</div>
+	</div>
+	<h2 class="view-head">Employee List</h2>
+	<div class="view-header">
+		{{#if (gt this.selected.size  0)}} {{!-- ember-truth-helper GT--}}
+				<button class="delete-employee" type="button" {{on-key 'Delete' this.deleteSelected}} {{ on "click" this.deleteSelected}} >{{!--Ember KeyBoard--}}
+					Delete Selected <span style="color:rgb(222, 222, 222)">[Delete]</span>
+				</button>
+		{{else}}
+				<button class="add-employee" type="button" {{on "click" this.goToAdd}}>
+					Add New Employee
+				</button>
+		{{/if}}
+		<div class="search-container">
+			<input type="text" id="search" class="search-box" placeholder="Search [ ALT + S ]" 
+				value={{this.searchText}}
+				{{ on-key '_all' this.update}}
+				{{ on-key 'Escape' this.clear }}
+			>
+				<PowerSelect
+					@options={{this.allColumns}}
+					@placeholder = "⌛"
+					@onChange = {{this.refresh}}
+					@triggerClass="small-trigger"
+					@dropdownClass="wide-options"
+					class="inp"
+					style="width: 150px;"
+					as | column |
+				>
+					<div class="column-flex">
+						<Input
+							@type="checkbox"
+							@checked={{column.search}}
+							{{on "change" (fn this.toggleSearch column)}}
+						/>
+						<label for="column" class="width:75%">{{column.name}}</label>
+					</div>
+				</PowerSelect>
+		</div>
+		<div class="column-chooser">
+			<PowerSelect
+				@options={{this.allColumns}}
+				@placeholder = "Visible Columns"
+				@onChange = {{this.toggleVisible}}
+				class="visible"
+				style="width: 150px;"
+				as | column |			
+			>
+				<div class="column-flex">
+					<Input
+						@type="checkbox"
+						@checked={{this.isVisible column}}
+						{{on "change" (fn this.toggleVisible column)}}
+					/>
+					<label for="column" class="width:75%">{{column.name}}</label>
+				</div>
+			</PowerSelect>
+		</div>
+		<div class="overflow-view">
+			<button class={{if this.isOverFlowMode 'overflow-button active' 'overflow-button'}} type="button" {{ on "click" this.toOverflow}}>
+				<img src="/assets/images/narrow.png" alt="narrow" class="image-narrow">
+			</button>
+		</div>
+		<div class="no-overflow-view">
+			<button class={{if this.isOverFlowMode 'no-overflow-button' 'no-overflow-button active'}}  type="button" {{ on "click" this.toNoOverflow}}>
+				<img src="/assets/images/wide.png" alt="wide" class="image-wide">
+			</button>
+		</div>
+	</div>
+</div>
+{{!-- <TableContainer/> --}}
+<div class="view-container" {{ on-key 'alt+s' this.searchFocus}}>
+	<div class={{if this.isOverFlowMode "view-content overflow" 'view-content no-overflow'}} {{ on-key 'alt+a' this.toggleAll}} {{on-click-outside this.selectedClear}}>
+		<table class="employee-table" >
+			<thead class="main-thead">
+				<tr>
+					<th class="main-th">
+						<input class="check-box" type="checkbox" 
+						checked={{eq this.selected.size this.employeesL.length}} 
+							{{ on "change" this.toggleAll }}
+						>Alt+A
+					</th>
+					<th class="main-th">S.No</th>
+					{{#each this.visibleColumns as |column|}}
+						<th class="main-th" data-column-id={{column.key}}>
+							<div class="table-head">
+								<p style="flex: 1;">{{column.name}}</p>
+								<button class="sort-button" type="button" {{ on "click" (fn this.changeSortColumn column.key)}}>
+									{{if (eq this.sortColumn column.key)
+									(if (eq this.sortDirection "asc") "🔼" "🔽")
+									"↕️"}}
+								</button>
+							</div>
+						</th>
+					{{/each}}
+					<th class="main-th">Actions</th>
+				</tr>
+			</thead>
+			<tbody class="vertical">
+				<VerticalCollection
+					@items={{this.employeesL}}
+					@estimateHeight={{50}}
+					@staticHeight={{true}}
+					@bufferSize={{9}}
+					@renderAll={{false}}
+					@lastReached={{this.loadMore}}
+					@containerSelector=".view-content"
+					as |employee index|
+				>
+					<tr>
+						<td class="main-td"><input class="check-box" checked={{this.isSelected employee.id}} {{on "change" (fn this.toggle employee.id)}} type="checkbox"></td>
+						<td class="main-td" {{on "click" ( fn this.setNestTableIndex index)}}>{{this.incrementIndex index}}</td>
+						{{#each this.visibleColumns as |column|}}
+							<td class="main-td" {{on "click" ( fn this.setNestTableIndex index)}}>
+								{{#if (eq column.key "employmentType")}}
+									{{employee.employmentType.label}}
+								{{else}}
+									{{get employee column.key}}
+								{{/if}}
+							</td>
+						{{/each}}
+						<td  class="main-td">
+							<div class="action-buttons">
+								{{#unless this.selectedSize}}
+									<LinkTo @route="edit" @model={{employee.id}} class="edit-button">
+										<img src="/assets/images/edit.png" alt="edit" class="image-icon">                                    
+									</LinkTo>
+								{{/unless}}
+								<button type="button" {{ on "click" (fn this.delete employee.id) }} class="delete-button">
+									<img src="/assets/images/delete.png" alt="delete" class="image-icon">
+								</button>
+							</div>
+						</td>
+						
+					</tr>
+					{{#if (eq this.showNestTableIndex index)}}
+					<tr>
+						<td colspan="10">
+							<div >
+								<NestedTable @employee={{employee}}/>
+							</div>
+						</td>						
+					</tr>
+					{{/if}}
+				</VerticalCollection>
+			</tbody>
+		</table>
+			{{#if (eq this.employeesL.length 0 )}}
+				<div class="flex">
+					<button class="add-employee" type="button" {{on "click" this.goToAdd}}>
+						Add New Employee
+					</button>
+				</div>
+			{{/if}}
+		{{#if (and this.isLoading true)}}
+			<div class="loading-indicator">
+				Loading more employees...
+			</div>
+		{{/if}}
+	</div>
+</div>

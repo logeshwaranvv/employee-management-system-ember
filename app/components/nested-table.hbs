@@ -1,0 +1,26 @@
+<table class="nested-table">
+  <thead class="nested-thead">
+    <tr>
+      {{#if @employee.projects.length}}
+        {{#each-in @employee.projects.[0] as |key|}}
+          <th class="nested-th">{{key}}</th>
+        {{/each-in}}
+      {{else}}
+        <th>No project data available</th>
+      {{/if}}
+    </tr>
+  </thead>
+  <tbody>
+    {{#if @employee.projects.length}}
+      {{#each @employee.projects as |project|}}
+        <tr>
+          {{#each-in project as |key value|}}
+            <td class="nested-td">{{value}}</td>
+          {{/each-in}}     
+        </tr>   
+      {{/each}}
+    {{else}}
+      <td>No project data available</td>
+    {{/if}}
+  </tbody>
+</table>
