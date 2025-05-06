@@ -4,8 +4,8 @@ module.exports = function (environment) {
   const ENV = {
     modulePrefix: 'ember-app',
     environment,
-    rootURL: '/',
-    locationType: 'history',
+    rootURL: '/employee-management-system-ember/',
+    locationType: 'hash',
     EmberENV: {
       EXTEND_PROTOTYPES: false,
       FEATURES: {
