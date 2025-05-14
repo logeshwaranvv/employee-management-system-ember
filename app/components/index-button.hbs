@@ -1,0 +1,10 @@
+<LinkTo @route={{@action}} class="{{@action}}-employee-button index-button">
+  <div class="image-box">
+    {{#if (eq @action "add")}}
+      <p>Add Employee</p>
+    {{else}}
+      <p>View Employees</p>
+    {{/if}}
+    <img src="/assets/images/{{@action}}.png" alt="employee" class="image-button">
+  </div>
+</LinkTo>

@@ -1,0 +1,22 @@
+<div  class="container">
+		<div class="info-container" {{on-click-outside this.hide}}>
+			<div class="liquid-demo">
+				<div class="info-head">
+					<button class="info-button" type="button" {{ on "click" this.change}}>
+						<img src="/assets/images/info.png" alt="info" class="image-info">
+					</button>
+					<h2>Get Started!</h2>
+				</div>
+				<div class="liquid-container">
+					<LiquidSpacer style="text-align: center;width:100%;" @growDuration={{500}}
+					class="liquid-spacer">
+						<div>
+							{{#if this.showMessage}}
+								<p class="inner-text">Welcome! Select an employee to view or edit their details</p>
+							{{/if}}
+						</div>
+					</LiquidSpacer>
+				</div>
+			</div>
+		</div>
+	</div>
